@@ -1,0 +1,775 @@
+		<!DOCTYPE html>
+		<html lang="pt-BR">
+		<head>
+			<meta charset="UTF-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<title>Códice de Criação de Sagas Épicas</title>
+			<script src="https://cdn.tailwindcss.com"></script>
+			<link rel="preconnect" href="https://fonts.googleapis.com">
+			<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+			<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+			<style>
+				body {
+					font-family: 'Inter', sans-serif;
+					background-color: #2d3748; /* Dark Slate */
+					color: #e2e8f0; /* Lighter Gray */
+				}
+				h1, h2, h3, h4 {
+					font-family: 'Cinzel', serif;
+					font-weight: 700;
+					letter-spacing: 0.05em;
+				}
+				.input-field, .textarea-field {
+					background-color: #4a5568; /* Gray Slate */
+					border: 1px solid #718096; /* Lighter Slate */
+					color: #e2e8f0;
+					transition: all 0.3s ease;
+				}
+				.input-field::placeholder, .textarea-field::placeholder {
+					color: #a0aec0;
+				}
+				.input-field:focus, .textarea-field:focus {
+					outline: none;
+					border-color: #9f7aea; /* Soft Purple */
+					box-shadow: 0 0 0 3px rgba(159, 122, 234, 0.3);
+				}
+				.btn-primary {
+					background-color: #805ad5; /* Purple */
+					color: #ffffff;
+					font-family: 'Cinzel', serif;
+					font-weight: 700;
+					transition: all 0.3s ease;
+					border: 1px solid #805ad5;
+				}
+				.btn-primary:hover {
+					background-color: #6b46c1; /* Darker Purple */
+					transform: translateY(-2px);
+					box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+				}
+				.btn-secondary {
+					background-color: transparent;
+					color: #9f7aea;
+					font-family: 'Cinzel', serif;
+					font-weight: 700;
+					transition: all 0.3s ease;
+					border: 1px solid #9f7aea;
+				}
+				.btn-secondary:hover {
+					background-color: rgba(159, 122, 234, 0.1);
+					color: #b794f4;
+				}
+				.selectable-block, .choice-button {
+					background-color: #4a5568;
+					border: 1px solid #718096;
+					cursor: pointer;
+					transition: all 0.3s ease;
+					position: relative;
+				}
+				.selectable-block:hover, .choice-button:hover {
+					border-color: #9f7aea;
+					transform: translateY(-2px);
+					box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+				}
+				.selectable-block.selected {
+					background-color: #5a3e9a;
+					border-color: #9f7aea;
+					color: #fff;
+					box-shadow: 0 0 15px rgba(159, 122, 234, 0.4);
+				}
+				.tooltip {
+					visibility: hidden;
+					width: 220px;
+					background-color: #2d3748;
+					color: #fff;
+					text-align: center;
+					border-radius: 6px;
+					padding: 8px;
+					position: absolute;
+					z-index: 10;
+					bottom: 125%;
+					left: 50%;
+					margin-left: -110px;
+					opacity: 0;
+					transition: opacity 0.3s;
+					border: 1px solid #9f7aea;
+					font-family: 'Inter', sans-serif;
+					font-size: 0.8rem;
+					pointer-events: none;
+				}
+				.has-tooltip:hover .tooltip {
+					visibility: visible;
+					opacity: 1;
+				}
+				.section-divider {
+					height: 2px;
+					background: linear-gradient(to right, transparent, #9f7aea, transparent);
+					margin: 3rem 0;
+				}
+				.hidden {
+					display: none;
+				}
+				.tab-button {
+					padding: 0.5rem 1rem;
+					border: none;
+					background: none;
+					color: #a0aec0;
+					cursor: pointer;
+					transition: all 0.2s;
+					border-bottom: 2px solid transparent;
+				}
+				.tab-button.active {
+					color: #b794f4;
+					border-bottom-color: #b794f4;
+					font-weight: 600;
+				}
+			</style>
+		</head>
+		<body class="antialiased">
+
+			<div class="container mx-auto p-4 sm:p-8 max-w-5xl">
+				<header class="text-center mb-8">
+					<h1 class="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-purple-400 to-purple-500">Códice de Criação de Sagas</h1>
+					<p class="text-lg text-gray-400 mt-2">Forje seus mundos, heróis e cenas com esta ferramenta de arquiteto.</p>
+				</header>
+
+				<nav id="navigation" class="text-left mb-8 h-10">
+					<button id="back-btn" class="btn-secondary px-4 py-2 rounded-lg hidden">
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+						</svg>
+						Voltar
+					</button>
+				</nav>
+
+				<main id="content-wrapper">
+
+					<!-- Passo 1: Escolha Inicial -->
+					<section id="step-initial-choice" class="step-section text-center">
+						<h2 class="text-3xl mb-4">Comece sua Jornada</h2>
+						<p class="text-gray-400 mb-8">O que você deseja forjar primeiro?</p>
+						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+							<button data-target="step-roteiro" class="choice-button p-6 rounded-lg flex flex-col items-center justify-center">
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l6-3a1 1 0 00.553-1.894L15 9m0 4V7m0 0l-6-3m6 3l6-3" /></svg>
+								<h3 class="text-xl">Criar Roteiro</h3>
+							</button>
+							<button data-target="step-personagem-choice" class="choice-button p-6 rounded-lg flex flex-col items-center justify-center">
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+								<h3 class="text-xl">Criar Personagem</h3>
+							</button>
+							 <button data-target="step-cena" class="choice-button p-6 rounded-lg flex flex-col items-center justify-center">
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+								<h3 class="text-xl">Criar Cena</h3>
+							</button>
+							<button data-target="step-dicas" class="choice-button p-6 rounded-lg flex flex-col items-center justify-center">
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-9-5.494h18" /></svg>
+								<h3 class="text-xl">Dicas dos Mestres</h3>
+							</button>
+						</div>
+					</section>
+
+					<!-- Formulário de Roteiro (Dados da Saga) -->
+					<section id="step-roteiro" class="step-section hidden">
+						<div class="flex items-center gap-4 mb-2">
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l6-3a1 1 0 00.553-1.894L15 9m0 4V7m0 0l-6-3m6 3l6-3" /></svg>
+							<h2 class="text-3xl">Dados da Saga</h2>
+						</div>
+						<p class="text-gray-400 mb-6 ml-12">Defina os pilares da sua história, do conceito geral às suas maiores inspirações.</p>
+						<div id="form-roteiro">
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+								<div>
+									<label for="title" class="block mb-2 font-semibold">Título da Obra</label>
+									<input type="text" id="title" class="input-field w-full p-3 rounded-lg" placeholder="Ex: A Sombra do Último Dragão">
+								</div>
+								<div>
+									<label for="author" class="block mb-2 font-semibold">Nome do Autor</label>
+									<input type="text" id="author" class="input-field w-full p-3 rounded-lg" placeholder="Ex: Elara Vance">
+								</div>
+							</div>
+							<div class="mb-6">
+								<label for="synopsis" class="block mb-2 font-semibold">Resumo/Sinopse</label>
+								<textarea id="synopsis" class="textarea-field w-full p-3 rounded-lg h-32" placeholder="Descreva a premissa central de sua história..."></textarea>
+							</div>
+							<div class="mb-8">
+								<h3 class="text-xl mb-4 font-semibold">Gêneros Principais (selecione até 3)</h3>
+								<div id="genres" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+							</div>
+							<div class="mb-8">
+								<h3 class="text-xl mb-4 font-semibold">Estilo Narrativo</h3>
+								<div id="narrative-style" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+							</div>
+							<div class="mb-8">
+								<h3 class="text-xl mb-4 font-semibold">Elementos Épicos Desejados (selecione até 6)</h3>
+								<div id="epic-elements" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+							</div>
+							<div class="mb-6">
+								<h3 class="text-xl mb-4 font-semibold">Fontes de Inspiração (selecione até 3)</h3>
+								<div id="inspirations" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-4"></div>
+								<div class="flex items-center gap-4">
+									<input type="text" id="new-inspiration" class="input-field flex-grow p-3 rounded-lg" placeholder="Adicionar outra inspiração...">
+									<button id="add-inspiration-btn" class="btn-primary px-4 py-3 rounded-lg">Adicionar</button>
+								</div>
+							</div>
+						</div>
+						<div class="text-center mt-8">
+							<div class="section-divider"></div>
+							<button id="generate-roteiro-summary-btn" class="btn-primary px-8 py-4 rounded-lg text-lg mb-6">Gerar Resumo do Roteiro</button>
+							<textarea id="roteiro-summary" class="textarea-field w-full p-4 rounded-lg h-64 bg-[#1A202C] text-left hidden" readonly></textarea>
+						</div>
+					</section>
+
+					<!-- Escolha do Arquétipo de Personagem -->
+					<section id="step-personagem-choice" class="step-section hidden text-center">
+						<h2 class="text-3xl mb-4">Escolha o Arquétipo</h2>
+						<p class="text-gray-400 mb-8">Qual papel este personagem desempenha na sua saga?</p>
+						<div id="archetype-grid" class="grid grid-cols-2 md:grid-cols-4 gap-6"></div>
+					</section>
+
+					<!-- Formulário de Personagem -->
+					<section id="step-personagem-form" class="step-section hidden">
+						<div class="flex items-center gap-4 mb-2">
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+							<h2 id="character-form-title" class="text-3xl">Ficha do Personagem</h2>
+						</div>
+						<p id="character-form-subtitle" class="text-gray-400 mb-6 ml-12">Mergulhe na mente do seu personagem para criar um ser complexo e verossímil.</p>
+						<div id="form-personagem">
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+								<div>
+									<label for="char-name" class="block mb-2 font-semibold">Nome do Personagem</label>
+									<input type="text" id="char-name" class="input-field w-full p-3 rounded-lg" placeholder="Ex: Kaelen, Lyra, Jax">
+								</div>
+								<div>
+									<label for="char-profile" class="block mb-2 font-semibold">Perfil Básico</label>
+									<input type="text" id="char-profile" class="input-field w-full p-3 rounded-lg" placeholder="Idade, ocupação, nacionalidade, posição social...">
+								</div>
+							</div>
+							<div class="mb-8 p-6 rounded-lg bg-[#4a5568]/30 border border-[#718096]">
+								<h3 class="text-xl mb-4 font-semibold">Big Five (OCEAN)</h3>
+								<p class="text-gray-400 -mt-2 mb-6">Este modelo descreve a personalidade em cinco grandes dimensões.</p>
+								<div id="big-five" class="space-y-4"></div>
+							</div>
+							<div class="mb-8">
+								<h3 class="text-xl mb-4 font-semibold">Tríade Sombria (opcional para anti-heróis/vilões)</h3>
+								<div id="dark-triad" class="grid grid-cols-1 sm:grid-cols-3 gap-4"></div>
+							</div>
+							<div class="mb-6">
+								<label for="physical-communication" class="block mb-2 font-semibold">Aspectos Físicos e Comunicação</label>
+								<textarea id="physical-communication" class="textarea-field w-full p-3 rounded-lg h-24" placeholder="Descreva a aparência, postura, voz, tiques, etc..."></textarea>
+							</div>
+							<div class="mb-8 p-6 rounded-lg bg-[#4a5568]/30 border border-[#718096]">
+								<h3 class="text-2xl mb-2 text-center">Camada Cognitiva & Motivacional</h3>
+								<p class="text-gray-400 mb-6 text-center">O "software" da mente do personagem: suas crenças mais profundas.</p>
+								<div class="mb-4">
+									<label for="central-belief" class="block mb-2 font-semibold">Crença Central</label>
+									<input type="text" id="central-belief" class="input-field w-full p-3 rounded-lg" placeholder="Ex: 'Sou incompetente', 'Não sou digno de amor', 'O mundo é perigoso'">
+								</div>
+								<div>
+									<label for="character-lie" class="block mb-2 font-semibold">A Mentira que o Personagem Acredita</label>
+									<input type="text" id="character-lie" class="input-field w-full p-3 rounded-lg" placeholder="Ex: 'Preciso ser perfeito para ser amado', 'Se eu confiar, serei traído'">
+								</div>
+							</div>
+							<div class="mb-8">
+								<h3 class="text-xl mb-4 font-semibold">Distorções Cognitivas Favoritas (selecione 2 ou 3)</h3>
+								<div id="cognitive-distortions" class="grid grid-cols-2 md:grid-cols-3 gap-4"></div>
+							</div>
+							<div class="mb-8 p-6 rounded-lg bg-[#4a5568]/30 border border-[#718096]">
+								<h3 class="text-2xl mb-2 text-center">Feridas e Esquemas Emocionais</h3>
+								<p class="text-gray-400 mb-6 text-center">As "cicatrizes" da alma que ditam padrões de comportamento.</p>
+								<div class="mb-6">
+									<label for="childhood-wound" class="block mb-2 font-semibold">Ferida da Infância</label>
+									<input type="text" id="childhood-wound" class="input-field w-full p-3 rounded-lg" placeholder="Ex: 'Falta de vínculo seguro', 'Exigência de perfeição'">
+								</div>
+								<div class="mb-6">
+									<h4 class="text-lg mb-3 font-semibold">Esquema Inicial Desadaptativo (EID - selecione até 2)</h4>
+									<div id="eid-schemas" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+								</div>
+								<div>
+									<h4 class="text-lg mb-3 font-semibold">Estilo de Enfrentamento do Esquema</h4>
+									<div id="coping-style" class="grid grid-cols-1 sm:grid-cols-3 gap-4"></div>
+								</div>
+							</div>
+							<div class="mb-8 p-6 rounded-lg bg-[#4a5568]/30 border border-[#718096]">
+								<h3 class="text-2xl mb-2 text-center">Arco Narrativo Psicológico</h3>
+								 <p class="text-gray-400 mb-6 text-center">A jornada de transformação interna do personagem.</p>
+								<div class="space-y-4">
+									<div>
+										<label for="truth-to-learn" class="block mb-2 font-semibold">A Verdade que o Personagem Precisa Aprender</label>
+										<input type="text" id="truth-to-learn" class="input-field w-full p-3 rounded-lg" placeholder="Ex: 'Meu valor não depende da aprovação dos outros'">
+									</div>
+									<div>
+										<label for="inciting-incident" class="block mb-2 font-semibold">O Incidente Incitante como Quebra Psicológica</label>
+										<input type="text" id="inciting-incident" class="input-field w-full p-3 rounded-lg" placeholder="Ex: 'Um fracasso público o força a questionar sua perfeição'">
+									</div>
+									<div>
+										<label for="climax-choice" class="block mb-2 font-semibold">O Clímax como Escolha Psicológica</label>
+										<input type="text" id="climax-choice" class="input-field w-full p-3 rounded-lg" placeholder="Ex: 'Ele deve confiar em alguém para sobreviver'">
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="text-center mt-8">
+							<div class="section-divider"></div>
+							<button id="generate-personagem-summary-btn" class="btn-primary px-8 py-4 rounded-lg text-lg mb-6">Gerar Ficha do Personagem</button>
+							<textarea id="personagem-summary" class="textarea-field w-full p-4 rounded-lg h-64 bg-[#1A202C] text-left hidden" readonly></textarea>
+						</div>
+					</section>
+
+					<!-- Formulário de Criação de Cena -->
+					<section id="step-cena" class="step-section hidden">
+						 <div class="flex items-center gap-4 mb-2">
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+							<h2 class="text-3xl">Criação de Cena</h2>
+						</div>
+						<p class="text-gray-400 mb-6 ml-12">Construa os momentos que definem sua história, um de cada vez.</p>
+						<div id="form-cena" class="space-y-6">
+							 <div>
+								<label for="scene-title" class="block mb-2 font-semibold">Título ou Resumo da Cena</label>
+								<input type="text" id="scene-title" class="input-field w-full p-3 rounded-lg" placeholder="Ex: O Duelo na Ponte Quebrada">
+							</div>
+							 <div>
+								<label for="scene-setting" class="block mb-2 font-semibold">Cenário</label>
+								<textarea id="scene-setting" class="textarea-field w-full p-3 rounded-lg h-24" placeholder="Descreva o local, a hora do dia, o clima e a atmosfera geral."></textarea>
+							</div>
+							 <div>
+								<label for="scene-characters" class="block mb-2 font-semibold">Personagens Presentes</label>
+								<input type="text" id="scene-characters" class="input-field w-full p-3 rounded-lg" placeholder="Liste os personagens principais e secundários na cena.">
+							</div>
+							 <div>
+								<label for="scene-objective" class="block mb-2 font-semibold">Objetivo da Cena</label>
+								<textarea id="scene-objective" class="textarea-field w-full p-3 rounded-lg h-24" placeholder="O que esta cena precisa realizar para a história? (Ex: Revelar uma informação, aumentar a tensão, desenvolver um relacionamento)"></textarea>
+							</div>
+							 <div>
+								<label for="scene-events" class="block mb-2 font-semibold">Eventos Principais (em pontos)</label>
+								<textarea id="scene-events" class="textarea-field w-full p-3 rounded-lg h-32" placeholder="1. Herói chega ao local.&#x0a;2. Confronta o guarda.&#x0a;3. Descobre a pista secreta.&#x0a;4. Escapa por pouco."></textarea>
+							</div>
+							 <div>
+								<h3 class="text-xl mb-4 font-semibold">Tom Emocional (selecione até 3)</h3>
+								<div id="emotional-tone" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-4"></div>
+								<div class="flex items-center gap-4">
+									<input type="text" id="new-emotional-tone" class="input-field flex-grow p-3 rounded-lg" placeholder="Adicionar outro tom...">
+									<button id="add-emotional-tone-btn" class="btn-primary px-4 py-3 rounded-lg">Adicionar</button>
+								</div>
+							</div>
+						</div>
+						 <div class="text-center mt-8">
+							<div class="section-divider"></div>
+							<button id="generate-cena-summary-btn" class="btn-primary px-8 py-4 rounded-lg text-lg mb-6">Gerar Resumo da Cena</button>
+							<textarea id="cena-summary" class="textarea-field w-full p-4 rounded-lg h-64 bg-[#1A202C] text-left hidden" readonly></textarea>
+						</div>
+					</section>
+					
+					<!-- Seção Dicas dos Mestres -->
+					<section id="step-dicas" class="step-section hidden">
+						<div class="flex justify-between items-center mb-4">
+							<h2 class="text-3xl text-purple-300">Biblioteca dos Mestres</h2>
+						</div>
+						<p class="text-gray-400 mb-6">Consulte a sabedoria dos grandes mestres para aprimorar sua arte.</p>
+						
+						<div id="dicas-tabs" class="border-b border-gray-600 mb-6">
+							<!-- Tab buttons will be inserted here -->
+						</div>
+
+						<div id="dicas-content" class="space-y-6">
+							<!-- Tab content will be inserted here -->
+						</div>
+
+						<div class="mt-8 text-center">
+							 <div class="section-divider"></div>
+							<button id="copy-dicas-btn" class="btn-primary px-8 py-3 rounded-lg">Copiar Dicas da Aba Ativa</button>
+						</div>
+					</section>
+
+				</main>
+			</div>
+
+			<script>
+				document.addEventListener('DOMContentLoaded', () => {
+					// --- DATA ---
+					const genresData = [ { name: "Fantasia", desc: "Magia, criaturas míticas e mundos imaginários." }, { name: "Ficção Científica", desc: "Tecnologia avançada, espaço e futuros alternativos." }, { name: "Aventura", desc: "Jornadas, exploração e perigos." }, { name: "Romance", desc: "Foco nas relações e emoções amorosas." }, { name: "Mitologia", desc: "Baseado em mitos e lendas de culturas reais." }, { name: "Terror", desc: "Busca evocar medo e suspense." }, { name: "Suspense", desc: "Tensão e expectativa sobre o que vai acontecer." }, { name: "Épico Histórico", desc: "Grandes eventos baseados em períodos históricos." }, { name: "Distopia", desc: "Sociedades futuristas opressivas e disfuncionais." }, { name: "Young Adult", desc: "Focado em protagonistas e temas adolescentes." }, { name: "Alta Fantasia", desc: "Mundo completamente separado do nosso, com regras próprias." }, { name: "Fantasia Sombria", desc: "Tons mais sombrios e moralmente ambíguos." }, ];
+					const epicElementsData = [ { name: "Batalhas monumentais", desc: "Conflitos em larga escala." }, { name: "Profecias e lendas", desc: "Previsões antigas que guiam a trama." }, { name: "Viagens e jornadas", desc: "O enredo é impulsionado por uma longa viagem." }, { name: "Reinos ou impérios", desc: "Intrigas políticas e sociais." }, { name: "Magia ou poderes", desc: "Sistemas de habilidades místicas." }, { name: "Rituais sagrados", desc: "Cerimônias com significado profundo." }, { name: "Criaturas lendárias", desc: "Presença de seres fantásticos." }, { name: "Alianças e traições", desc: "Pactos formados e quebrados." }, { name: "Objetos mágicos", desc: "Artefatos com poderes centrais." }, { name: "Conflitos familiares", desc: "Disputas de poder e lealdade." }, { name: "Heróis relutantes", desc: "Protagonistas empurrados para a grandeza." }, { name: "Antagonistas carismáticos", desc: "Vilões com motivações complexas." }, ];
+					const inspirationsData = ["Tolkien", "Brandon Sanderson", "Game of Thrones", "Mitologia Grega", "Mitologia Nórdica", "Star Wars", "Avatar: A Lenda de Aang", "J.K. Rowling", "Patrick Rothfuss", "Ursula K. Le Guin", "História Medieval", "Lendas Celtas"];
+					const bigFiveData = [ { trait: "Abertura à Experiência", desc: "Mede o quão aberto alguém é a novas ideias e experiências.", low: "Prático, convencional", high: "Imaginativo, curioso" }, { trait: "Conscienciosidade", desc: "Refere-se à tendência de ser organizado e disciplinado.", low: "Impulsivo, desorganizado", high: "Disciplinado, planejador" }, { trait: "Extroversão", desc: "Indica de onde o personagem tira sua energia: de interações sociais ou do tempo sozinho.", low: "Reservado, quieto", high: "Sociável, enérgico" }, { trait: "Amabilidade", desc: "Mede o quão cooperativo e empático um personagem é.", low: "Competitivo, cético", high: "Cooperativo, empático" }, { trait: "Neuroticismo", desc: "Refere-se à estabilidade emocional. Alto neuroticismo indica ansiedade.", low: "Calmo, resiliente", high: "Ansioso, reativo" }, ];
+					const cognitiveDistortionsData = [ { name: "Catastrofização", desc: "“E se o pior acontecer?”" }, { name: "Leitura Mental", desc: "“Eu sei o que eles pensam de mim”" }, { name: "Tudo ou Nada", desc: "“Se não for perfeito, é fracasso total”" }, { name: "Imperativos", desc: "“Eu deveria ter feito melhor…”" }, { name: "Raciocínio Emocional", desc: "“Eu sinto que é verdade, então é”" }, { name: "Personalização", desc: "“A culpa é minha se algo der errado”" }, ];
+					const eidSchemasData = ["Abandono", "Desconfiança/Abuso", "Privação Emocional", "Defeito/Vergonha", "Isolamento Social", "Dependência", "Vulnerabilidade", "Emaranhamento", "Fracasso", "Submissão", "Auto-sacrifício", "Busca de Aprovação", "Negatividade", "Padrões Inflexíveis"];
+					const copingStylesData = [ { name: "Rendição", desc: "Aceita o esquema como verdade." }, { name: "Evitação", desc: "Foge de situações que ativam o esquema." }, { name: "Hipercompensação", desc: "Age de forma oposta para negar o esquema." }, ];
+					const stressReactionsData = [ { name: "Posição Esquizoparanoide", desc: "Visão em preto e branco, desconfiança." }, { name: "Posição Depressiva", desc: "Culpa excessiva, desejo de reparar." }, ];
+					const archetypesData = [
+						{ name: "O Herói", icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />' },
+						{ name: "O Vilão / Sombra", icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 1.052A10.952 10.952 0 003.512 5.252c-1.6 2.84-1.22 6.36.8 8.8.8 1.2 1.8 2.2 2.9 3l.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.e" />' },
+						{ name: "O Mentor / Mago", icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />' },
+						{ name: "O Aliado", icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />' },
+						{ name: "Personagem Secundário", icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21v-1a6 6 0 00-1.781-4.121M12 10.875a4 4 0 100-5.292M12 10.875a4 4 0 110 5.292" />' },
+					];
+					const masterTipsData = {
+						"Estrutura e Roteiro": [
+							{ author: "Christopher Vogler", tip: "A Jornada do Herói não é uma fórmula, mas uma forma. Use seus 12 estágios (Mundo Comum, Chamado à Aventura, Recusa, etc.) como um guia para criar arcos de personagem ressonantes e universalmente compreendidos. Pense nela como uma ferramenta de diagnóstico para encontrar os pontos fracos do seu rascunho.", reference: "Vogler C. A Jornada do Escritor: Estrutura Mítica para Escritores. 3a ed. Nova Fronteira; 2015." },
+							{ author: "Stephen King", tip: "As histórias são como fósseis, relíquias a serem encontradas. O trabalho do escritor é escavar a história com as ferramentas do ofício, não planejá-la até a morte. Confie na intuição e descubra a narrativa à medida que avança.", reference: "King S. Sobre a Escrita: A Arte em Memórias. Rio de Janeiro: Objetiva; 2015." },
+							{ author: "Orson Scott Card", tip: "Use o Quociente MICE (Milieu, Idea, Character, Event) para diagnosticar o motor da sua história. Toda trama contém os quatro, mas um será dominante. Alinhar sua estrutura com o elemento dominante (ex: uma história de Personagem deve focar na transformação interna) evita que a narrativa perca o foco.", reference: "Card OS. Characters and Viewpoint. Writer's Digest Books; 1999."},
+							{ author: "Sol Stein", tip: "Suspense é incerteza ansiosa. Para criá-lo, dê a cada personagem em uma cena um 'roteiro' secreto e conflitante. A tensão não virá do que eles dizem, mas do que eles escondem e dos objetivos opostos que perseguem.", reference: "Stein S. Stein on Writing. St. Martin's Griffin; 1995."},
+							{ author: "John Gardner", tip: "O gênero não é uma prisão, mas uma ferramenta de pensamento. Dominar um gênero (fantasia, terror, etc.) dá ao escritor uma estrutura e um conjunto de expectativas do leitor para usar, subverter e inovar.", reference: "Gardner J. The Art of Fiction. Vintage; 1991."},
+							{ author: "Stephen King", tip: "Enredo é a última coisa com que se preocupar. Concentre-se em colocar personagens interessantes em uma situação difícil e veja como eles tentam sair dela. A história surgirá das decisões e ações deles, não de um plano pré-concebido.", reference: "King S. Sobre a Escrita: A Arte em Memórias. Rio de Janeiro: Objetiva; 2015."},
+							{ author: "Christopher Vogler", tip: "Os arquétipos (Herói, Mentor, Sombra) são funções, não personagens rígidos. Um personagem pode usar a 'máscara' de um arquétipo em uma cena e outra máscara em outra, tornando-os mais dinâmicos e psicologicamente complexos.", reference: "Vogler C. A Jornada do Escritor. 3a ed. Nova Fronteira; 2015."}
+						],
+						"Criação de Personagem": [
+							{ author: "Anne Lamott", tip: "Dê a seus personagens as verdades da sua própria vida. Personagens memoráveis são falhos, contraditórios e humanos. Não tenha medo de lhes dar suas próprias neuroses e pequenas vitórias. A honestidade sobre a condição humana é a chave para um personagem crível.", reference: "Lamott A. Palavra por Palavra: Instruções sobre Escrever e sobre a Vida. Rocco; 1997."},
+							{ author: "Sol Stein", tip: "Faça o leitor se apaixonar pelo seu personagem o mais rápido possível. Personagens nos envolvem primeiro e são mais lembrados. Dê-lhes qualidades admiráveis, vulnerabilidades com as quais podemos nos identificar ou coloque-os em perigo imediato para gerar empatia.", reference: "Stein S. Stein on Writing. St. Martin's Griffin; 1995."},
+							{ author: "John Gardner", tip: "O personagem deve ser consistente e crível para manter o 'sonho vívido e contínuo' da ficção. Cada ação e pensamento deve emanar de uma psicologia compreensível, mesmo que complexa. Uma quebra na lógica do personagem quebra a imersão do leitor.", reference: "Gardner J. The Art of Fiction. Vintage; 1991."},
+							{ author: "Aaron T. Beck (Psicologia)", tip: "Uma Crença Central ('Eu sou um fracasso', 'Não sou digno de amor') é o 'sistema operacional' de um personagem. Suas reações a eventos não são sobre o evento em si, mas sobre como ele é filtrado por essa crença fundamental.", reference: "Beck AT. Cognitive Therapy and the Emotional Disorders. Penguin; 1979."},
+							{ author: "Jeffrey Young (Psicologia)", tip: "A 'ferida da infância' de um personagem (Esquema Desadaptativo) explica por que ele repete os mesmos erros. Ele é inconscientemente atraído por situações que reencenam essa dor original. A trama deve forçá-lo a confrontar essa ferida.", reference: "Young JE, Klosko JS. Reinventing Your Life. Plume; 1994."},
+							{ author: "Stephen King", tip: "A boa escrita de personagem vem da honestidade. Você deve estar disposto a colocar seus personagens em situações terríveis e ser honesto sobre como eles reagiriam. Não os proteja; teste-os.", reference: "King S. Sobre a Escrita: A Arte em Memórias. Rio de Janeiro: Objetiva; 2015."},
+							{ author: "Orson Scott Card", tip: "Pense em seus personagens em uma hierarquia. Personagens principais precisam de complexidade total. Personagens secundários precisam de uma motivação clara e alguns traços distintivos. Figurantes precisam apenas de uma função. Não desperdice tempo do leitor desenvolvendo quem não importa.", reference: "Card OS. Characters and Viewpoint. Writer's Digest Books; 1999."}
+						],
+						"Prosa e Diálogo": [
+							{ author: "Strunk & White", tip: "Omita palavras desnecessárias. Uma frase não deve conter palavras desnecessárias, um parágrafo não deve conter frases desnecessárias, pela mesma razão que uma máquina não deve ter peças desnecessárias. A escrita vigorosa é concisa.", reference: "Strunk Jr W, White EB. Os Elementos do Estilo. 4a ed. Pearson; 2000."},
+							{ author: "Francine Prose", tip: "Aperfeiçoe a sentença. A arte literária reside na palavra, na frase, no parágrafo. Leia os mestres lentamente, palavra por palavra, para entender como eles usam o ritmo, a cadência e a escolha precisa do verbo para criar emoção e significado.", reference: "Prose F. Para Ler como um Escritor. Zahar; 2009."},
+							{ author: "Sol Stein", tip: "O melhor diálogo é oblíquo. Personagens raramente dizem o que realmente pensam. Use o subtexto para revelar seus verdadeiros desejos e medos. O diálogo deve avançar o enredo, revelar o personagem e criar tensão, tudo ao mesmo tempo.", reference: "Stein S. Stein on Writing. St. Martin's Griffin; 1995."},
+							{ author: "Stephen King", tip: "A estrada para o inferno está pavimentada com advérbios. Eles são como dentes-de-leão no gramado da sua prosa. Na maioria das vezes, o advérbio é um sinal de que seu verbo não é forte o suficiente.", reference: "King S. Sobre a Escrita: A Arte em Memórias. Rio de Janeiro: Objetiva; 2015."},
+							{ author: "John Gardner", tip: "Cada falha na prosa — um clichê, uma metáfora confusa, um ritmo quebrado — quebra o 'sonho ficcional'. O trabalho do escritor é manter o leitor imerso, e isso exige um controle técnico impecável no nível da frase.", reference: "Gardner J. The Art of Fiction. Vintage; 1991."},
+							{ author: "Strunk & White", tip: "Use a voz ativa. A voz ativa é mais direta e vigorosa que a passiva. 'O menino chutou a bola' é melhor que 'A bola foi chutada pelo menino'. A voz passiva é frequentemente o refúgio de escritores tímidos.", reference: "Strunk Jr W, White EB. Os Elementos do Estilo. 4a ed. Pearson; 2000."},
+							{ author: "Francine Prose", tip: "As palavras são a matéria-prima. A escolha entre 'caminhar', 'vaguear', 'marchar' ou 'arrastar-se' não é trivial; é uma decisão que define o personagem e o tom da cena. Cada palavra importa.", reference: "Prose F. Para Ler como um Escritor. Zahar; 2009."}
+						],
+						"Processo Criativo": [
+							{ author: "Anne Lamott", tip: "Abrace o 'primeiro rascunho de merda'. Quase toda boa escrita começa com esforços iniciais terríveis. Dar a si mesmo permissão para escrever mal é a única maneira de silenciar o crítico interno e começar. Você não pode editar uma página em branco.", reference: "Lamott A. Palavra por Palavra: Instruções sobre Escrever e sobre a Vida. Rocco; 1997."},
+							{ author: "Stephen King", tip: "A disciplina é o alicerce. Tenha uma meta diária de palavras e um espaço de escrita dedicado. A rotina treina sua mente para entrar no modo criativo. A musa não é uma entidade etérea; ela é uma operária que aparece quando você bate o ponto.", reference: "King S. Sobre a Escrita: A Arte em Memórias. Rio de Janeiro: Objetiva; 2015."},
+							{ author: "Natalie Goldberg", tip: "Confie nos seus 'primeiros pensamentos'. A prática da escrita é como a meditação Zen. Mantenha a mão em movimento, não censure, não corrija. Capture o fluxo bruto da sua mente para encontrar sua voz mais autêntica e poderosa.", reference: "Goldberg N. Escrevendo com a Alma: Liberando o Escritor Interior. Agir; 2006."},
+							{ author: "Stephen King", tip: "Escreva com a porta fechada, reescreva com a porta aberta. O primeiro rascunho é para você. É íntimo. Depois, você precisa de um Leitor Ideal de confiança para obter uma perspectiva externa e ver o que realmente funciona.", reference: "King S. Sobre a Escrita: A Arte em Memórias. Rio de Janeiro: Objetiva; 2015."},
+							{ author: "Anne Lamott", tip: "Use tarefas curtas. Não tente escrever um romance. Apenas escreva o que você pode ver através de uma 'moldura de uma polegada'. Descreva uma memória, uma sala, uma conversa. A soma dessas pequenas partes se tornará a obra maior.", reference: "Lamott A. Palavra por Palavra: Instruções sobre Escrever e sobre a Vida. Rocco; 1997."},
+							{ author: "Natalie Goldberg", tip: "Use sua vida como 'compostagem'. Tudo o que acontece com você — o bom, o ruim, o mundano — é material. Deixe essas experiências se decomporem em seu subconsciente e elas se tornarão o solo fértil para sua escrita.", reference: "Goldberg N. Escrevendo com a Alma: Liberando o Escritor Interior. Agir; 2006."},
+							{ author: "Stephen King", tip: "Se você não tem tempo para ler, não tem tempo (ou as ferramentas) para escrever. A leitura é o centro criativo da vida de um escritor. Leia constantemente, tanto em seu gênero quanto fora dele, para aprender o que é possível.", reference: "King S. Sobre a Escrita: A Arte em Memórias. Rio de Janeiro: Objetiva; 2015."}
+						]
+					};
+					const emotionalTonesData = ["Tensão", "Suspense", "Ação", "Melancolia", "Alívio Cômico", "Romance", "Admiração", "Medo", "Triunfo", "Desespero", "Intriga", "Nostalgia"];
+
+					// --- UTILITY FUNCTIONS ---
+					function createBlock(item, group, type, limit) {
+						const block = document.createElement('div');
+						block.className = 'selectable-block p-3 rounded-lg text-center has-tooltip';
+						block.dataset.group = group;
+						block.dataset.value = item.name || item;
+						block.dataset.type = type;
+						if (limit) block.dataset.limit = limit;
+						
+						const name = document.createElement('span');
+						name.textContent = item.name || item;
+						block.appendChild(name);
+
+						if (item.desc) {
+							const tooltip = document.createElement('div');
+							tooltip.className = 'tooltip';
+							tooltip.textContent = item.desc;
+							block.appendChild(tooltip);
+						}
+						return block;
+					}
+
+					function populateContainer(containerId, data, group, type, limit) {
+						const container = document.getElementById(containerId);
+						if (!container) return;
+						container.innerHTML = ''; // Clear container before populating
+						data.forEach(item => {
+							container.appendChild(createBlock(item, group, type, limit));
+						});
+					}
+
+					// --- NAVIGATION & STATE ---
+					const navigationStack = ['step-initial-choice'];
+					let currentStep = 'step-initial-choice';
+					let currentArchetype = '';
+
+					function showStep(stepId) {
+						document.querySelectorAll('.step-section').forEach(el => el.classList.add('hidden'));
+						const stepElement = document.getElementById(stepId);
+						if(stepElement) stepElement.classList.remove('hidden');
+						currentStep = stepId;
+
+						const backBtn = document.getElementById('back-btn');
+						if (stepId === 'step-initial-choice') {
+							backBtn.classList.add('hidden');
+						} else {
+							backBtn.classList.remove('hidden');
+						}
+					}
+
+					function navigateTo(targetStepId) {
+						navigationStack.push(currentStep);
+						showStep(targetStepId);
+					}
+					
+					// --- INITIALIZATION ---
+					function initializeApp() {
+						// Populate dynamic sections
+						populateContainer('genres', genresData, 'genres', 'multiple', 3);
+						populateContainer('epic-elements', epicElementsData, 'epic-elements', 'multiple', 6);
+						populateContainer('inspirations', inspirationsData, 'inspirations', 'multiple', 3);
+						populateContainer('cognitive-distortions', cognitiveDistortionsData, 'cognitive-distortions', 'multiple', 3);
+						populateContainer('eid-schemas', eidSchemasData, 'eid-schemas', 'multiple', 2);
+						populateContainer('coping-style', copingStylesData, 'coping-style', 'single');
+						populateContainer('stress-reaction', stressReactionsData, 'stress-reaction', 'single');
+						populateContainer('emotional-tone', emotionalTonesData.map(t => ({name: t})), 'emotional-tone', 'multiple', 3);
+						
+						const narrativeStyleContainer = document.getElementById('narrative-style');
+						if(narrativeStyleContainer) {
+							narrativeStyleContainer.innerHTML = `
+								<div class="selectable-block p-4 rounded-lg text-center has-tooltip" data-group="narrative-style" data-value="Primeira pessoa">Primeira Pessoa<span class="tooltip">Narrado a partir do 'eu'. O leitor só sabe o que o narrador sabe e sente. Gera grande intimidade.</span></div>
+								<div class="selectable-block p-4 rounded-lg text-center has-tooltip" data-group="narrative-style" data-value="Terceira pessoa limitada">Terceira Limitada<span class="tooltip">Segue um personagem ('ele'/'ela'), mostrando seus pensamentos. Pode trocar de personagem entre capítulos.</span></div>
+								<div class="selectable-block p-4 rounded-lg text-center has-tooltip" data-group="narrative-style" data-value="Terceira pessoa onisciente">Terceira Onisciente<span class="tooltip">O narrador sabe tudo sobre todos. Oferece máxima flexibilidade, mas exige cuidado para não sobrecarregar.</span></div>
+								<div class="selectable-block p-4 rounded-lg text-center has-tooltip" data-group="narrative-style" data-value="Misto/Experimental">Misto/Experimental<span class="tooltip">Combina diferentes pontos de vista ou usa técnicas não convencionais para contar a história.</span></div>
+							`;
+						}
+
+						const darkTriadContainer = document.getElementById('dark-triad');
+						if(darkTriadContainer) {
+							darkTriadContainer.innerHTML = `
+								<div class="selectable-block p-4 rounded-lg text-center" data-group="dark-triad" data-value="Narcisismo">Narcisismo</div>
+								<div class="selectable-block p-4 rounded-lg text-center" data-group="dark-triad" data-value="Maquiavelismo">Maquiavelismo</div>
+								<div class="selectable-block p-4 rounded-lg text-center" data-group="dark-triad" data-value="Psicopatia">Psicopatia</div>
+							`;
+						}
+
+
+						// Populate Big Five
+						const bigFiveContainer = document.getElementById('big-five');
+						if (bigFiveContainer) {
+							bigFiveContainer.innerHTML = '';
+							bigFiveData.forEach(item => {
+								const traitContainer = document.createElement('div');
+								traitContainer.className = 'p-4 rounded-md border border-gray-600';
+								const traitLabel = document.createElement('label');
+								traitLabel.className = 'block mb-1 font-semibold text-purple-300';
+								traitLabel.textContent = item.trait;
+								traitContainer.appendChild(traitLabel);
+								const traitDesc = document.createElement('p');
+								traitDesc.className = 'text-sm text-gray-400 mb-3';
+								traitDesc.textContent = item.desc;
+								traitContainer.appendChild(traitDesc);
+								const optionsContainer = document.createElement('div');
+								optionsContainer.className = 'flex gap-4';
+								const lowBlock = document.createElement('div');
+								lowBlock.className = 'selectable-block p-3 rounded-lg text-center flex-1';
+								lowBlock.dataset.group = `big-five-${item.trait.toLowerCase().replace(/\s/g, '-')}`;
+								lowBlock.dataset.value = `Baixa (${item.low})`;
+								lowBlock.dataset.type = 'single';
+								lowBlock.innerHTML = `<strong class="font-normal text-red-300">Baixa:</strong> ${item.low}`;
+								const highBlock = document.createElement('div');
+								highBlock.className = 'selectable-block p-3 rounded-lg text-center flex-1';
+								highBlock.dataset.group = `big-five-${item.trait.toLowerCase().replace(/\s/g, '-')}`;
+								highBlock.dataset.value = `Alta (${item.high})`;
+								highBlock.dataset.type = 'single';
+								highBlock.innerHTML = `<strong class="font-normal text-green-300">Alta:</strong> ${item.high}`;
+								optionsContainer.appendChild(lowBlock);
+								optionsContainer.appendChild(highBlock);
+								traitContainer.appendChild(optionsContainer);
+								bigFiveContainer.appendChild(traitContainer);
+							});
+						}
+
+						// Populate Archetypes
+						const archetypeGrid = document.getElementById('archetype-grid');
+						if (archetypeGrid) {
+							archetypeGrid.innerHTML = '';
+							archetypesData.forEach(archetype => {
+								const button = document.createElement('button');
+								button.dataset.target = 'step-personagem-form';
+								button.dataset.archetype = archetype.name;
+								button.className = 'choice-button p-6 rounded-lg flex flex-col items-center justify-center';
+								button.innerHTML = `
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-3 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">${archetype.icon}</svg>
+									<h4 class="text-xl">${archetype.name}</h4>
+								`;
+								archetypeGrid.appendChild(button);
+							});
+						}
+
+						// Populate Dicas
+						const dicasTabsContainer = document.getElementById('dicas-tabs');
+						const dicasContentContainer = document.getElementById('dicas-content');
+						if (dicasTabsContainer && dicasContentContainer) {
+							dicasTabsContainer.innerHTML = '';
+							dicasContentContainer.innerHTML = '';
+							Object.keys(masterTipsData).forEach((category, index) => {
+								const tabButton = document.createElement('button');
+								tabButton.className = 'tab-button';
+								if (index === 0) tabButton.classList.add('active');
+								tabButton.textContent = category;
+								tabButton.dataset.tab = category.replace(/\s/g, '-');
+								dicasTabsContainer.appendChild(tabButton);
+
+								const contentPanel = document.createElement('div');
+								contentPanel.id = category.replace(/\s/g, '-');
+								contentPanel.className = 'tab-content space-y-6';
+								if (index !== 0) contentPanel.classList.add('hidden');
+								
+								masterTipsData[category].forEach(tip => {
+									contentPanel.innerHTML += `
+										<div class="p-4 rounded-lg bg-gray-700/50">
+											<h4 class="text-lg text-purple-300 mb-2">${tip.author}</h4>
+											<p class="text-gray-300 mb-2">${tip.tip}</p>
+											<p class="text-xs text-gray-500"><strong>Referência:</strong> ${tip.reference}</p>
+										</div>
+									`;
+								});
+								dicasContentContainer.appendChild(contentPanel);
+							});
+						}
+					}
+
+					// --- EVENT LISTENERS ---
+					document.addEventListener('click', function(e) {
+						const choiceBtn = e.target.closest('.choice-button');
+						if (choiceBtn && choiceBtn.dataset.target) {
+							const targetStep = choiceBtn.dataset.target;
+							if(choiceBtn.dataset.archetype) {
+								currentArchetype = choiceBtn.dataset.archetype;
+								document.getElementById('character-form-title').textContent = `Ficha do ${currentArchetype}`;
+							}
+							navigateTo(targetStep);
+							return;
+						}
+
+						const selectable = e.target.closest('.selectable-block');
+						if (selectable) {
+							const group = selectable.dataset.group;
+							const type = selectable.dataset.type;
+							const limit = parseInt(selectable.dataset.limit);
+
+							if (type === 'single') {
+								document.querySelectorAll(`.selectable-block[data-group="${group}"]`).forEach(el => el.classList.remove('selected'));
+								selectable.classList.add('selected');
+							} else if (type === 'multiple') {
+								const selectedCount = document.querySelectorAll(`.selectable-block[data-group="${group}"].selected`).length;
+								if (selectable.classList.contains('selected')) {
+									selectable.classList.remove('selected');
+								} else if (!limit || selectedCount < limit) {
+									selectable.classList.add('selected');
+								} else {
+									alert(`Você pode selecionar no máximo ${limit} opções.`);
+								}
+							}
+							return;
+						}
+
+						const tabBtn = e.target.closest('.tab-button');
+						if (tabBtn) {
+							const targetTabId = tabBtn.dataset.tab;
+							document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+							tabBtn.classList.add('active');
+							document.querySelectorAll('.tab-content').forEach(panel => panel.classList.add('hidden'));
+							document.getElementById(targetTabId).classList.remove('hidden');
+						}
+					});
+
+					document.getElementById('back-btn').addEventListener('click', () => {
+						if (navigationStack.length > 1) {
+							const previousStep = navigationStack.pop();
+							showStep(previousStep);
+						}
+					});
+
+					document.getElementById('add-inspiration-btn')?.addEventListener('click', () => {
+						const input = document.getElementById('new-inspiration');
+						const value = input.value.trim();
+						if (value) {
+							const container = document.getElementById('inspirations');
+							const newBlock = createBlock(value, 'inspirations', 'multiple', 3);
+							container.appendChild(newBlock);
+							input.value = '';
+						}
+					});
+					
+					document.getElementById('add-emotional-tone-btn')?.addEventListener('click', () => {
+						const input = document.getElementById('new-emotional-tone');
+						const value = input.value.trim();
+						if (value) {
+							const container = document.getElementById('emotional-tone');
+							const newBlock = createBlock({name: value}, 'emotional-tone', 'multiple', 3);
+							container.appendChild(newBlock);
+							input.value = '';
+						}
+					});
+					
+					// --- SUMMARY GENERATION ---
+					const getValue = (id) => document.getElementById(id).value.trim();
+					const getSelected = (group) => Array.from(document.querySelectorAll(`.selectable-block[data-group="${group}"].selected`)).map(el => el.dataset.value);
+
+					document.getElementById('generate-roteiro-summary-btn')?.addEventListener('click', () => {
+						let summary = "RESUMO DO ROTEIRO DA SAGA\n=========================\n\n";
+						summary += `Título da Obra: ${getValue('title') || 'Não preenchido'}\n`;
+						summary += `Nome do Autor: ${getValue('author') || 'Não preenchido'}\n\n`;
+						summary += `Resumo/Sinopse:\n${getValue('synopsis') || 'Não preenchido'}\n\n`;
+						summary += `Gêneros Principais: ${getSelected('genres').join(', ') || 'Não selecionado'}\n`;
+						summary += `Estilo Narrativo: ${getSelected('narrative-style').join(', ') || 'Não selecionado'}\n`;
+						summary += `Elementos Épicos: ${getSelected('epic-elements').join(', ') || 'Não selecionado'}\n`;
+						summary += `Fontes de Inspiração: ${getSelected('inspirations').join(', ') || 'Não selecionado'}\n`;
+						const outputTextarea = document.getElementById('roteiro-summary');
+						outputTextarea.value = summary;
+						outputTextarea.classList.remove('hidden');
+					});
+
+					document.getElementById('generate-personagem-summary-btn')?.addEventListener('click', () => {
+						let summary = `FICHA DE PERSONAGEM: ${currentArchetype.toUpperCase()}\n================================\n\n`;
+						summary += `Nome do Personagem: ${getValue('char-name') || 'Não preenchido'}\n`;
+						summary += `Perfil Básico: ${getValue('char-profile') || 'Não preenchido'}\n\n`;
+						summary += "Big Five (OCEAN):\n";
+						bigFiveData.forEach(item => {
+							const group = `big-five-${item.trait.toLowerCase().replace(/\s/g, '-')}`;
+							summary += `  - ${item.trait}: ${getSelected(group)[0] || 'Não selecionado'}\n`;
+						});
+						summary += `\nTríade Sombria: ${getSelected('dark-triad').join(', ') || 'Nenhuma selecionada'}\n\n`;
+						summary += `Aspectos Físicos e Comunicação:\n${getValue('physical-communication') || 'Não preenchido'}\n\n`;
+						summary += "Camada Cognitiva & Motivacional:\n";
+						summary += `  - Crença Central: ${getValue('central-belief') || 'Não preenchido'}\n`;
+						summary += `  - A Mentira que Acredita: ${getValue('character-lie') || 'Não preenchido'}\n\n`;
+						summary += `Distorções Cognitivas: ${getSelected('cognitive-distortions').join(', ') || 'Não selecionado'}\n\n`;
+						summary += "Feridas e Esquemas Emocionais:\n";
+						summary += `  - Ferida da Infância: ${getValue('childhood-wound') || 'Não preenchido'}\n`;
+						summary += `  - Esquemas (EID): ${getSelected('eid-schemas').join(', ') || 'Não selecionado'}\n`;
+						summary += `  - Estilo de Enfrentamento: ${getSelected('coping-style').join(', ') || 'Não selecionado'}\n\n`;
+						summary += "Arco Narrativo Psicológico:\n";
+						summary += `  - A Verdade a Aprender: ${getValue('truth-to-learn') || 'Não preenchido'}\n`;
+						summary += `  - Incidente Incitante: ${getValue('inciting-incident') || 'Não preenchido'}\n`;
+						summary += `  - Escolha no Clímax: ${getValue('climax-choice') || 'Não preenchido'}\n`;
+						const outputTextarea = document.getElementById('personagem-summary');
+						outputTextarea.value = summary;
+						outputTextarea.classList.remove('hidden');
+					});
+
+					document.getElementById('generate-cena-summary-btn')?.addEventListener('click', () => {
+						let summary = "RESUMO DA CENA\n===============\n\n";
+						summary += `Título/Resumo: ${getValue('scene-title') || 'Não preenchido'}\n\n`;
+						summary += `Cenário:\n${getValue('scene-setting') || 'Não preenchido'}\n\n`;
+						summary += `Personagens Presentes: ${getValue('scene-characters') || 'Não preenchido'}\n\n`;
+						summary += `Objetivo da Cena:\n${getValue('scene-objective') || 'Não preenchido'}\n\n`;
+						summary += `Eventos Principais:\n${getValue('scene-events') || 'Não preenchido'}\n\n`;
+						summary += `Tom Emocional: ${getSelected('emotional-tone').join(', ') || 'Não selecionado'}\n`;
+						const outputTextarea = document.getElementById('cena-summary');
+						outputTextarea.value = summary;
+						outputTextarea.classList.remove('hidden');
+					});
+
+					// --- Dicas Section Logic ---
+					document.getElementById('copy-dicas-btn')?.addEventListener('click', () => {
+						const activeTab = document.querySelector('#dicas-content .tab-content:not(.hidden)');
+						if (activeTab) {
+							let textToCopy = `DICAS DOS MESTRES - ${document.querySelector('#dicas-tabs .tab-button.active').textContent}\n======================================\n\n`;
+							const tips = activeTab.querySelectorAll('.p-4');
+							tips.forEach(tip => {
+								const author = tip.querySelector('h4').textContent;
+								const advice = tip.querySelector('p.text-gray-300').textContent;
+								const reference = tip.querySelector('p.text-xs').textContent;
+								textToCopy += `AUTOR: ${author}\nDICA: ${advice}\n${reference}\n\n`;
+							});
+
+							const tempTextarea = document.createElement('textarea');
+							tempTextarea.value = textToCopy;
+							document.body.appendChild(tempTextarea);
+							tempTextarea.select();
+							document.execCommand('copy');
+							document.body.removeChild(tempTextarea);
+							alert('Dicas copiadas para a área de transferência!');
+						}
+					});
+
+					initializeApp();
+				});
+			</script>
+		</body>
+		</html>
